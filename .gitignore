@@ -1,0 +1,39 @@
+# Local secrets
+.env
+*.env
+!.env.example
+magento2/auth.json
+
+# Magento dependencies and generated/runtime files
+magento2/vendor/
+magento2/var/
+magento2/generated/
+magento2/pub/static/
+magento2/pub/media/
+magento2/pub/opt/
+magento2/pub/sitemap/
+magento2/pub/errors/local.xml
+magento2/app/etc/env.php
+magento2/app/etc/config.php
+magento2/app/etc/db_schema_whitelist.json
+magento2/update/
+
+# Magento package archives and reports
+magento2/*.log
+magento2/*.tar
+magento2/*.tar.gz
+magento2/*.zip
+
+# Node/frontend tooling sometimes created by Magento themes
+magento2/node_modules/
+magento2/.grunt/
+magento2/.sass-cache/
+
+# Docker and OS/editor noise
+.docker/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
