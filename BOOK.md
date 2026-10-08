@@ -515,6 +515,51 @@ HTTP/1.1 200 OK
 Content-Type: image/jpeg
 ```
 
+### Disable Admin Two-Factor Authentication Locally
+
+The Magento admin showed a Two-Factor Authentication screen:
+
+```text
+Failed to send the message. Please contact the administrator
+You need to configure Two-Factor Authorization in order to proceed to your store's admin area
+```
+
+This happened because Magento tried to send a 2FA setup email, but the local Docker stack did not have a mail service configured.
+
+First, the enabled 2FA modules were checked:
+
+```sh
+cd /home/guosong/dev/megaton
+docker compose exec phpfpm sh -lc 'php bin/magento module:status | grep -i TwoFactor || true'
+```
+
+The result showed:
+
+```text
+Magento_TwoFactorAuth
+Magento_AdminAdobeImsTwoFactorAuth
+```
+
+For local development, those modules were disabled:
+
+```sh
+docker compose exec phpfpm sh -lc 'php bin/magento module:disable Magento_TwoFactorAuth Magento_AdminAdobeImsTwoFactorAuth; php bin/magento setup:upgrade; php bin/magento cache:flush'
+```
+
+Because disabling modules cleared generated classes and static files, Magento code and assets were regenerated:
+
+```sh
+docker compose exec phpfpm sh -lc 'php bin/magento setup:di:compile; php bin/magento setup:static-content:deploy -f en_US; php bin/magento cache:flush'
+```
+
+Finally, runtime folder ownership was restored:
+
+```sh
+docker compose exec -u root phpfpm sh -lc 'chown -R www-data:www-data var generated pub/static pub/media; chown -R 1000:1000 app/code app/design 2>/dev/null || true'
+```
+
+After this, the admin login no longer required the email-based 2FA setup step.
+
 ## After Magento Code Changes
 
 Magento source files live on the host in:
